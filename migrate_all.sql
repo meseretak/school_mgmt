@@ -359,6 +359,26 @@ CREATE TABLE IF NOT EXISTS library_reservations (
     FOREIGN KEY (teacher_id) REFERENCES teachers(id)
 );
 
+-- Book requests (students/teachers request books not in catalog)
+CREATE TABLE IF NOT EXISTS library_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    borrower_type ENUM('student','teacher') NOT NULL,
+    student_id INT NULL,
+    teacher_id INT NULL,
+    book_title VARCHAR(255) NOT NULL,
+    author VARCHAR(255),
+    isbn VARCHAR(30),
+    reason TEXT,
+    status ENUM('Pending','Approved','Rejected','Fulfilled') DEFAULT 'Pending',
+    requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reviewed_by INT NULL,
+    reviewed_at TIMESTAMP NULL,
+    notes TEXT,
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (teacher_id) REFERENCES teachers(id),
+    FOREIGN KEY (reviewed_by) REFERENCES users(id)
+);
+
 -- ═══ FROM migrate6.sql ═══
 -- ═══════════════════════════════════════════════════════════════
 -- Migration 6: Parent Portal, Feedback, Clearance, Transfer, Registrar
