@@ -1,6 +1,6 @@
 ﻿<?php
 require_once '../../includes/config.php';
-auth_check();
+auth_check(['admin','super_admin','teacher','student']);
 $student_id = (int)($_GET['student_id'] ?? 0);
 $year_id    = (int)($_GET['year_id'] ?? 0);
 $type       = $_GET['type'] ?? 'completion';

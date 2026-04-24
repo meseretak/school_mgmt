@@ -1,6 +1,6 @@
 <?php
 require_once '../../includes/config.php';
-auth_check();
+auth_check(['admin','super_admin','teacher']);
 $id = (int)($_GET['id'] ?? 0);
 $s = $pdo->prepare("SELECT s.*, c.name AS country_name FROM students s LEFT JOIN countries c ON s.country_id=c.id WHERE s.id=?");
 $s->execute([$id]); $student = $s->fetch();

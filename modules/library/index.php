@@ -1,10 +1,10 @@
 <?php
 require_once '../../includes/config.php';
-auth_check(['admin','super_admin','teacher','student','librarian']);
+auth_check(['librarian','admin','super_admin']);
 $page_title = 'Library'; $active_page = 'library';
 $uid      = $_SESSION['user']['id'];
 $role     = $_SESSION['user']['role'];
-$is_admin = is_admin();
+$is_admin = is_admin() || is_librarian();
 $teacher  = is_teacher() ? get_teacher_record($pdo) : null;
 $student  = is_student() ? get_student_record($pdo) : null;
 $FINE_PER_DAY = 0.50;

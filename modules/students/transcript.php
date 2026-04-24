@@ -1,6 +1,6 @@
 <?php
 require_once '../../includes/config.php';
-auth_check();
+auth_check(['admin','super_admin','teacher','student']);
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) { header('Location: index.php'); exit; }
 
