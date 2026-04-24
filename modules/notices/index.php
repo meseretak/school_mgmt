@@ -1,6 +1,6 @@
 <?php
 require_once '../../includes/config.php';
-auth_check();
+auth_check(['admin','super_admin','teacher','student','parent','librarian']);
 $page_title = 'Notice Board'; $active_page = 'notices';
 $uid = $_SESSION['user']['id']; $role = $_SESSION['user']['role'];
 

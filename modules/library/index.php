@@ -1,6 +1,6 @@
 <?php
 require_once '../../includes/config.php';
-auth_check(['admin','super_admin','teacher','student']);
+auth_check(['admin','super_admin','teacher','student','librarian']);
 $page_title = 'Library'; $active_page = 'library';
 $uid      = $_SESSION['user']['id'];
 $role     = $_SESSION['user']['role'];

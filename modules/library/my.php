@@ -1,6 +1,6 @@
 <?php
 require_once '../../includes/config.php';
-auth_check(['student','teacher']);
+auth_check(['student','teacher','librarian']);
 $page_title = 'Library'; $active_page = 'library';
 $uid = $_SESSION['user']['id']; $role = $_SESSION['user']['role'];
 $teacher = is_teacher() ? get_teacher_record($pdo) : null;
