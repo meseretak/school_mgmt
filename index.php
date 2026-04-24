@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 elseif ($user['role'] === 'teacher')   $dest = BASE_URL.'/modules/teacher/dashboard.php';
                 elseif ($user['role'] === 'student')   $dest = BASE_URL.'/modules/students/dashboard.php';
                 elseif ($user['role'] === 'librarian') $dest = BASE_URL.'/modules/library/librarian.php';
+                elseif ($user['role'] === 'parent')    $dest = BASE_URL.'/modules/parent/dashboard.php';
                 else $dest = BASE_URL.'/dashboard.php';
                 header('Location: '.$dest); exit;
             } else {
