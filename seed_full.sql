@@ -31,6 +31,15 @@ INSERT IGNORE INTO fee_types (id,name,amount,is_active) VALUES
 (1,'Tuition Fee',5000.00,1),(2,'Registration Fee',500.00,1),
 (3,'Library Fee',200.00,1),(4,'Lab Fee',300.00,1),(5,'Activity Fee',150.00,1);
 
+-- ── DEMO USERS (for testing) ──────────────────────────────────
+INSERT IGNORE INTO users (id,name,email,password,role,branch_id,is_active) VALUES
+(1,'Super Admin','superadmin@school.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','super_admin',NULL,1),
+(2,'Admin User','admin@school.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','admin',1,1),
+(3,'John Smith','teacher@school.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','teacher',1,1),
+(4,'Alice Johnson','student@school.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','student',1,1),
+(5,'Mary Librarian','librarian@school.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','librarian',1,1),
+(6,'Demo Parent','parent@school.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','parent',1,1);
+
 -- ── TEACHER USERS (10) ────────────────────────────────────────
 INSERT IGNORE INTO users (id,name,email,password,role,branch_id,is_active) VALUES
 (10,'Dr. Abebe Girma','abebe.girma@school.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','teacher',1,1),
@@ -45,6 +54,7 @@ INSERT IGNORE INTO users (id,name,email,password,role,branch_id,is_active) VALUE
 (19,'Ms. Selam Mengistu','selam.mengistu@school.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','teacher',2,1);
 
 INSERT IGNORE INTO teachers (id,user_id,teacher_code,first_name,last_name,specialization,phone,hire_date,status) VALUES
+(1,3,'EMP-TCH-2024-0003','John','Smith','General Studies','+251911000003','2023-09-01','Active'),
 (10,10,'EMP-TCH-2024-0010','Abebe','Girma','Mathematics & Statistics','+251911100010','2020-09-01','Active'),
 (11,11,'EMP-TCH-2024-0011','Tigist','Haile','English Language & Literature','+251911100011','2019-09-01','Active'),
 (12,12,'EMP-TCH-2024-0012','Dawit','Bekele','Physics & Applied Sciences','+251911100012','2021-09-01','Active'),
@@ -75,6 +85,7 @@ INSERT IGNORE INTO users (id,name,email,password,role,branch_id,is_active) VALUE
 (34,'Bethel Haile','bethel.h@student.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','student',1,1);
 
 INSERT IGNORE INTO students (id,user_id,student_code,branch_id,first_name,last_name,dob,gender,nationality,country_id,phone,enrollment_date,status) VALUES
+(4,4,'EMP-STU-2024-0004',1,'Alice','Johnson','2006-05-10','Female','Ethiopian',1,'+251922000004','2024-09-01','Active'),
 (20,20,'EMP-STU-2024-0020',1,'Meron','Tadesse','2005-03-14','Female','Ethiopian',1,'+251922200020','2024-09-01','Active'),
 (21,21,'EMP-STU-2024-0021',1,'Yonas','Abebe','2004-07-22','Male','Ethiopian',1,'+251922200021','2024-09-01','Active'),
 (22,22,'EMP-STU-2024-0022',1,'Selam','Worku','2005-11-05','Female','Ethiopian',1,'+251922200022','2024-09-01','Active'),
@@ -90,6 +101,13 @@ INSERT IGNORE INTO students (id,user_id,student_code,branch_id,first_name,last_n
 (32,32,'EMP-STU-2024-0032',1,'Sara','Mengistu','2005-07-08','Female','Ethiopian',1,'+251922200032','2024-09-01','Active'),
 (33,33,'EMP-STU-2024-0033',2,'Kidus','Solomon','2004-03-17','Male','Tanzanian',4,'+251922200033','2024-09-01','Active'),
 (34,34,'EMP-STU-2024-0034',1,'Bethel','Haile','2005-10-22','Female','Ethiopian',1,'+251922200034','2024-09-01','Active');
+
+-- ── PARENTS ───────────────────────────────────────────────────
+INSERT IGNORE INTO parents (id,user_id,first_name,last_name,phone,relationship) VALUES
+(1,6,'Demo','Parent','+251911000006','Father');
+
+-- Link demo parent to demo student
+INSERT IGNORE INTO student_parents (student_id,parent_id) VALUES (4,1);
 
 -- ── COURSES (10) ─────────────────────────────────────────────
 INSERT IGNORE INTO courses (id,name,code,credits,description,is_active) VALUES
