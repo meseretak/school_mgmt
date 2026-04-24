@@ -41,3 +41,16 @@ $recent_activity = $pdo->query("SELECT lb.*, bk.title,
     ORDER BY lb.borrowed_at DESC LIMIT 8")->fetchAll();
 
 require_once '../../includes/header.php';
+
+// Borrow trend last 6 months
+$borrow_trend = $pdo->query("SELECT DATE_FORMAT(borrowed_at,'%b %Y') AS mo, COUNT(*) AS cnt FROM library_borrows WHERE borrowed_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY DATE_FORMAT(borrowed_at,'%Y-%m') ORDER BY DATE_FORMAT(borrowed_at,'%Y-%m')")->fetchAll();
+// Category distribution
+$cat_dist = $pdo->query("SELECT COALESCE(category,'Uncategorized') AS cat, COUNT(*) AS cnt FROM library_books WHERE is_active=1 GROUP BY category ORDER BY cnt DESC LIMIT 8")->fetchAll();
+?>
+<!-- Header -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+  <div>
+    <h1 style="font-size:1.4rem;font-weight:800;color:#1e293b"><i class="fas fa-chart-bar" style="color:var(--primary);margin-right:8px"></i>Library Dashboard</h1>
+    <p style="color:#64748b;font-size:.88rem;margin-top:2px">Overview and reports — <?= date('l, F j, Y') ?></p>
+  </div>
+  <a href="librarian_desk.php" class="btn btn-primary"><i class="fas fa-tasks"></i> Libr
