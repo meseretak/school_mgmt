@@ -349,6 +349,27 @@ CREATE TABLE IF NOT EXISTS library_borrows (
 ALTER TABLE library_borrows
     MODIFY COLUMN status ENUM('Borrowed','Returned','Overdue','Lost','Return Requested') DEFAULT 'Borrowed';
 ALTER TABLE library_borrows ADD COLUMN IF NOT EXISTS damage_fee DECIMAL(8,2) DEFAULT 0.00 AFTER fine_amount;
+ALTER TABLE library_borrows ADD COLUMN IF NOT EXISTS condition_on_return ENUM('Good','Damaged','Lost') NULL AFTER damage_fee;
+ALTER TABLE library_borrows ADD COLUMN IF NOT EXISTS fine_paid_at TIMESTAMP NULL AFTER fine_paid;
+ALTER TABLE library_borrows ADD COLUMN IF NOT EXISTS fine_paid_by INT NULL AFTER fine_paid_at;
+ALTER TABLE library_borrows ADD COLUMN IF NOT EXISTS renewal_count INT DEFAULT 0 AFTER fine_paid_by;
+
+-- Book renewals
+CREATE TABLE IF NOT EXISTS library_renewals (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    borrow_id INT NOT NULL,
+    requested_by INT NOT NULL,
+    requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    old_due_date DATE NOT NULL,
+    new_due_date DATE NULL,
+    status ENUM('Pending','Approved','Rejected') DEFAULT 'Pending',
+    reviewed_by INT NULL,
+    reviewed_at TIMESTAMP NULL,
+    note TEXT,
+    FOREIGN KEY (borrow_id) REFERENCES library_borrows(id) ON DELETE CASCADE,
+    FOREIGN KEY (requested_by) REFERENCES users(id),
+    FOREIGN KEY (reviewed_by) REFERENCES users(id)
+);
 
 -- Book reservations (queue)
 CREATE TABLE IF NOT EXISTS library_reservations (
@@ -365,25 +386,36 @@ CREATE TABLE IF NOT EXISTS library_reservations (
     FOREIGN KEY (teacher_id) REFERENCES teachers(id)
 );
 
--- Book requests (students/teachers request books not in catalog)
+-- Book requests
 CREATE TABLE IF NOT EXISTS library_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    book_id INT NULL,
     borrower_type ENUM('student','teacher') NOT NULL,
     student_id INT NULL,
     teacher_id INT NULL,
-    book_title VARCHAR(255) NOT NULL,
-    author VARCHAR(255),
-    isbn VARCHAR(30),
-    reason TEXT,
-    status ENUM('Pending','Approved','Rejected','Fulfilled') DEFAULT 'Pending',
+    book_title VARCHAR(255) NOT NULL DEFAULT '',
+    needed_by DATE NULL,
+    note TEXT,
+    borrow_id INT NULL,
+    reject_reason TEXT,
+    status ENUM('Pending','Approved','Rejected','Fulfilled','Cancelled') DEFAULT 'Pending',
     requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     reviewed_by INT NULL,
     reviewed_at TIMESTAMP NULL,
-    notes TEXT,
+    FOREIGN KEY (book_id) REFERENCES library_books(id) ON DELETE SET NULL,
     FOREIGN KEY (student_id) REFERENCES students(id),
     FOREIGN KEY (teacher_id) REFERENCES teachers(id),
     FOREIGN KEY (reviewed_by) REFERENCES users(id)
 );
+
+-- Add missing columns to library_requests if upgrading
+ALTER TABLE library_requests ADD COLUMN IF NOT EXISTS book_id INT NULL AFTER id;
+ALTER TABLE library_requests ADD COLUMN IF NOT EXISTS book_title VARCHAR(255) NOT NULL DEFAULT '' AFTER teacher_id;
+ALTER TABLE library_requests ADD COLUMN IF NOT EXISTS needed_by DATE NULL;
+ALTER TABLE library_requests ADD COLUMN IF NOT EXISTS note TEXT;
+ALTER TABLE library_requests ADD COLUMN IF NOT EXISTS borrow_id INT NULL;
+ALTER TABLE library_requests ADD COLUMN IF NOT EXISTS reject_reason TEXT;
+ALTER TABLE library_requests MODIFY COLUMN status ENUM('Pending','Approved','Rejected','Fulfilled','Cancelled') DEFAULT 'Pending';
 
 -- ═══ FROM migrate6.sql ═══
 -- ═══════════════════════════════════════════════════════════════
