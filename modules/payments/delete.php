@@ -1,0 +1,21 @@
+<?php
+require_once '../../includes/config.php';
+auth_check(['admin']);
+$id=(int)($_GET['id']??0);
+$pdo->prepare("DELETE FROM payments WHERE id=?")->execute([$id]);
+flash('Payment deleted.'); header('Location: index.php'); exit;
+SERVER['DOCUMENT_ROOT'].'/includes/config.php';
+auth_check(['admin']);
+$id=(int)($_GET['id']??0);
+$pdo->prepare("DELETE FROM payments WHERE id=?")->execute([$id]);
+flash('Payment deleted.'); header('Location: index.php'); exit;
+SERVER['DOCUMENT_ROOT'].'/includes/config.php';
+auth_check(['admin']);
+$id=(int)($_GET['id']??0);
+$pdo->prepare("DELETE FROM payments WHERE id=?")->execute([$id]);
+flash('Payment deleted.'); header('Location: index.php'); exit;
+SERVER['DOCUMENT_ROOT'].'/includes/config.php';
+auth_check(['admin']);
+$id=(int)($_GET['id']??0);
+$pdo->prepare("DELETE FROM payments WHERE id=?")->execute([$id]);
+flash('Payment deleted.'); header('Location: index.php'); exit;

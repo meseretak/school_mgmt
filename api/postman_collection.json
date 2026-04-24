@@ -1,0 +1,459 @@
+﻿{
+  "info": {
+    "name": "EduManage Pro â€” Full API",
+    "description": "Full API collection. SETUP: Import â†’ go to Variables tab â†’ set api_key to your key from Admin > Settings > API Keys.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url",   "value": "http://localhost/school_mgmt/api/v1.php", "type": "string" },
+    { "key": "api_key",    "value": "4427aaf89b6bfa3f4eaaf743a411c8b5ee578742f381f548", "type": "string" },
+    { "key": "student_id", "value": "1", "type": "string" },
+    { "key": "teacher_id", "value": "1", "type": "string" },
+    { "key": "class_id",   "value": "1", "type": "string" },
+    { "key": "payment_id", "value": "1", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Ping",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=ping",
+              "protocol": "http",
+              "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [{ "key": "endpoint", "value": "ping" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "List Students",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=students&status=Active",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "students" },
+                { "key": "status", "value": "Active" },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Student by ID",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=students&id=1",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "students" },
+                { "key": "id", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Student",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=create_student",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [{ "key": "endpoint", "value": "create_student" }]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"email\": \"john.doe@school.com\",\n  \"password\": \"password123\",\n  \"gender\": \"Male\",\n  \"nationality\": \"Ethiopian\",\n  \"phone\": \"+251911000001\",\n  \"dob\": \"2000-03-15\",\n  \"address\": \"Addis Ababa, Ethiopia\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=update_student",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [{ "key": "endpoint", "value": "update_student" }]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"student_id\": 1,\n  \"phone\": \"+251911999999\",\n  \"address\": \"Bole, Addis Ababa\",\n  \"status\": \"Active\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teachers",
+      "item": [
+        {
+          "name": "List Teachers",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=teachers",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [{ "key": "endpoint", "value": "teachers" }]
+            }
+          }
+        },
+        {
+          "name": "Create Teacher",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=create_teacher",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [{ "key": "endpoint", "value": "create_teacher" }]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"first_name\": \"Sara\",\n  \"last_name\": \"Ahmed\",\n  \"email\": \"sara.ahmed@school.com\",\n  \"password\": \"password123\",\n  \"specialization\": \"Mathematics\",\n  \"phone\": \"+251922000001\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Classes",
+      "item": [
+        {
+          "name": "List Classes",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=classes",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [{ "key": "endpoint", "value": "classes" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Enrollments",
+      "item": [
+        {
+          "name": "List Enrollments",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=enrollments",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "enrollments" },
+                { "key": "student_id", "value": "1", "disabled": true },
+                { "key": "class_id",   "value": "1", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Student Enrollments",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=enrollments&student_id=1",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "enrollments" },
+                { "key": "student_id", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Enroll Student in Class",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=enroll",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [{ "key": "endpoint", "value": "enroll" }]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"student_id\": 1,\n  \"class_id\": 1\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Grades",
+      "item": [
+        {
+          "name": "Get Student Grades",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=grades&student_id=1",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "grades" },
+                { "key": "student_id", "value": "1" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "Get Student Attendance",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=attendance&student_id=1",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "attendance" },
+                { "key": "student_id", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Class Attendance",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=attendance&class_id=1",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "attendance" },
+                { "key": "class_id", "value": "1" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "List All Payments",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=payments",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "payments" },
+                { "key": "status", "value": "Pending", "disabled": true },
+                { "key": "student_id", "value": "1", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Student Payments",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=payments&student_id=1",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "payments" },
+                { "key": "student_id", "value": "1" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Fee Types",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=fee_types",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [{ "key": "endpoint", "value": "fee_types" }]
+            }
+          }
+        },
+        {
+          "name": "Create Payment Record",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=payments",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [{ "key": "endpoint", "value": "payments" }]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"student_id\": 1,\n  \"fee_type_id\": 1,\n  \"amount_due\": 5000.00,\n  \"amount_paid\": 0,\n  \"due_date\": \"2026-05-01\",\n  \"status\": \"Pending\",\n  \"notes\": \"Tuition fee Term 1 2026\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Confirm Payment (Bank Callback)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=payment_confirm",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [{ "key": "endpoint", "value": "payment_confirm" }]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"payment_id\": 1,\n  \"amount_paid\": 5000.00,\n  \"transaction_ref\": \"TXN-CBE-20260407-001\",\n  \"provider\": \"Commercial Bank of Ethiopia\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Overdue Payments",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=payments&status=Overdue",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "payments" },
+                { "key": "status", "value": "Overdue" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "Chapa Webhook",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=webhook&provider=chapa",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "webhook" },
+                { "key": "provider", "value": "chapa" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"event\": \"charge.success\",\n  \"data\": {\n    \"tx_ref\": \"TXN-CHAPA-001\",\n    \"amount\": 5000,\n    \"currency\": \"ETB\",\n    \"status\": \"success\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Bank Generic Webhook",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=webhook&provider=bank",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [
+                { "key": "endpoint", "value": "webhook" },
+                { "key": "provider", "value": "bank" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"payment_id\": 1,\n  \"amount\": 5000.00,\n  \"reference\": \"BANK-REF-20260407\",\n  \"status\": \"success\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Academic",
+      "item": [
+        {
+          "name": "List Academic Years",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{api_key}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost/school_mgmt/api/v1.php?endpoint=academic_years",
+              "protocol": "http", "host": ["localhost"],
+              "path": ["school_mgmt","api","v1.php"],
+              "query": [{ "key": "endpoint", "value": "academic_years" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+

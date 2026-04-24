@@ -1,0 +1,8 @@
+vendor/
+uploads/documents/*
+!uploads/documents/.gitkeep
+*.log
+fix_*.php
+setup_*.php
+chattest*.php
+app.yaml

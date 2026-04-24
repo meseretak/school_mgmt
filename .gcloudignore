@@ -1,0 +1,10 @@
+.git
+.gitignore
+*.sql
+*.md
+node_modules/
+.env
+fix_*.php
+setup_*.php
+chattest*.php
+seed_*.sql
