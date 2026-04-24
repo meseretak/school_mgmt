@@ -31,15 +31,20 @@ $pdo = new PDO(
 
 session_start();
 
-// Refresh branch_id from DB only once per session, not every request
-if (isset($_SESSION['user']['id']) && !isset($_SESSION['branch_refreshed'])) {
+// Always refresh role from DB to prevent stale session role issues
+if (isset($_SESSION['user']['id'])) {
     try {
-        $s = $pdo->prepare("SELECT branch_id FROM users WHERE id=?");
+        $s = $pdo->prepare("SELECT role, branch_id, is_active FROM users WHERE id=?");
         $s->execute([$_SESSION['user']['id']]);
         $fresh = $s->fetch();
-        if ($fresh && $fresh['branch_id']) {
-            $_SESSION['user']['branch_id'] = $fresh['branch_id'];
+        if (!$fresh || !$fresh['is_active']) {
+            // User deactivated or not found — force logout
+            session_destroy();
+            header('Location: '.BASE_URL.'/index.php'); exit;
         }
+        // Always sync role and branch from DB
+        $_SESSION['user']['role'] = $fresh['role'];
+        if ($fresh['branch_id']) $_SESSION['user']['branch_id'] = $fresh['branch_id'];
         $_SESSION['branch_refreshed'] = true;
     } catch(Exception $e) {}
 }
