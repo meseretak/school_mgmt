@@ -8,7 +8,8 @@ $me = $_SESSION['user']['id'];
 try { $pdo->query("UPDATE library_borrows SET status='Overdue' WHERE status='Borrowed' AND due_date < CURDATE()"); } catch(Exception $e){}
 
 // All stats in minimal queries
-$stats = $pdo->query("SELECT
+$stats_defaults = ['total_titles'=>0,'total_copies'=>0,'available'=>0,'borrowed'=>0,'overdue'=>0,'total_returned'=>0,'returned_today'=>0,'lost'=>0,'fines_due'=>0,'fines_paid'=>0,'pending_requests'=>0,'return_requests'=>0,'total_students'=>0,'total_teachers'=>0,'students_with_books'=>0,'teachers_with_books'=>0];
+try { $stats = $pdo->query("SELECT
     (SELECT COUNT(*) FROM library_books WHERE is_active=1) AS total_titles,
     (SELECT COALESCE(SUM(total_copies),0) FROM library_books WHERE is_active=1) AS total_copies,
     (SELECT COALESCE(SUM(available_copies),0) FROM library_books WHERE is_active=1) AS available,
@@ -25,27 +26,27 @@ $stats = $pdo->query("SELECT
     (SELECT COUNT(*) FROM teachers WHERE status='Active') AS total_teachers,
     (SELECT COUNT(DISTINCT student_id) FROM library_borrows WHERE borrower_type='student' AND status IN('Borrowed','Overdue')) AS students_with_books,
     (SELECT COUNT(DISTINCT teacher_id) FROM library_borrows WHERE borrower_type='teacher' AND status IN('Borrowed','Overdue')) AS teachers_with_books
-")->fetch();
+")->fetch() ?: $stats_defaults; } catch(Exception $e) { $stats = $stats_defaults; }
 
-$top_books = $pdo->query("SELECT bk.title, bk.author, COUNT(lb.id) AS cnt
+try { $top_books = $pdo->query("SELECT bk.title, bk.author, COUNT(lb.id) AS cnt
     FROM library_borrows lb JOIN library_books bk ON lb.book_id=bk.id
-    GROUP BY lb.book_id ORDER BY cnt DESC LIMIT 8")->fetchAll();
+    GROUP BY lb.book_id ORDER BY cnt DESC LIMIT 8")->fetchAll(); } catch(Exception $e) { $top_books = []; }
 
-$recent_activity = $pdo->query("SELECT lb.*, bk.title,
+try { $recent_activity = $pdo->query("SELECT lb.*, bk.title,
     COALESCE(CONCAT(s.first_name,' ',s.last_name), CONCAT(t.first_name,' ',t.last_name)) AS borrower_name,
     lb.borrower_type
     FROM library_borrows lb
     JOIN library_books bk ON lb.book_id=bk.id
     LEFT JOIN students s ON lb.student_id=s.id
     LEFT JOIN teachers t ON lb.teacher_id=t.id
-    ORDER BY lb.borrowed_at DESC LIMIT 8")->fetchAll();
+    ORDER BY lb.borrowed_at DESC LIMIT 8")->fetchAll(); } catch(Exception $e) { $recent_activity = []; }
 
 require_once '../../includes/header.php';
 
 // Borrow trend last 6 months
-$borrow_trend = $pdo->query("SELECT DATE_FORMAT(borrowed_at,'%b %Y') AS mo, COUNT(*) AS cnt FROM library_borrows WHERE borrowed_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY DATE_FORMAT(borrowed_at,'%Y-%m') ORDER BY DATE_FORMAT(borrowed_at,'%Y-%m')")->fetchAll();
+try { $borrow_trend = $pdo->query("SELECT DATE_FORMAT(borrowed_at,'%b %Y') AS mo, COUNT(*) AS cnt FROM library_borrows WHERE borrowed_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) GROUP BY DATE_FORMAT(borrowed_at,'%Y-%m') ORDER BY DATE_FORMAT(borrowed_at,'%Y-%m')")->fetchAll(); } catch(Exception $e) { $borrow_trend = []; }
 // Category distribution
-$cat_dist = $pdo->query("SELECT COALESCE(category,'Uncategorized') AS cat, COUNT(*) AS cnt FROM library_books WHERE is_active=1 GROUP BY category ORDER BY cnt DESC LIMIT 8")->fetchAll();
+try { $cat_dist = $pdo->query("SELECT COALESCE(category,'Uncategorized') AS cat, COUNT(*) AS cnt FROM library_books WHERE is_active=1 GROUP BY category ORDER BY cnt DESC LIMIT 8")->fetchAll(); } catch(Exception $e) { $cat_dist = []; }
 ?>
 <!-- Header -->
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">

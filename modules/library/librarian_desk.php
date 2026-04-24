@@ -4,7 +4,7 @@ auth_check(['librarian','admin','super_admin']);
 $page_title = 'Librarian Desk'; $active_page = 'librarian_desk';
 $me = $_SESSION['user']['id'];
 
-$cfg = $pdo->query("SELECT * FROM library_settings WHERE id=1")->fetch();
+try { $cfg = $pdo->query("SELECT * FROM library_settings WHERE id=1")->fetch(); } catch(Exception $e) { $cfg = []; }
 $FPD = (float)($cfg['fine_per_day'] ?? 0.50);
 $BD  = (int)($cfg['max_borrow_days'] ?? 14);
 

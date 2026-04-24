@@ -12,11 +12,33 @@ $children = $pdo->prepare("
     SELECT s.*, u.email, sp.is_primary,
         (SELECT COUNT(*) FROM payments WHERE student_id=s.id AND status IN('Pending','Overdue')) AS pending_count,
         (SELECT COALESCE(SUM(amount_due-amount_paid),0) FROM payments WHERE student_id=s.id AND status IN('Pending','Overdue','Partial')) AS balance_due,
+        (SELECT COALESCE(SUM(amount_paid),0) FROM payments WHERE student_id=s.id AND status='Paid') AS total_paid,
+        (SELECT COALESCE(SUM(amount_due),0) FROM payments WHERE student_id=s.id) AS total_fees,
         (SELECT COUNT(*) FROM enrollments WHERE student_id=s.id AND status='Enrolled') AS enrolled_courses,
-        (SELECT ROUND(AVG(g.marks_obtained/ex.total_marks*100),1) FROM grades g JOIN enrollments en ON g.enrollment_id=en.id JOIN exams ex ON g.exam_id=ex.id WHERE en.student_id=s.id) AS avg_grade
+        (SELECT ROUND(AVG(g.marks_obtained/ex.total_marks*100),1) FROM grades g JOIN enrollments en ON g.enrollment_id=en.id JOIN exams ex ON g.exam_id=ex.id WHERE en.student_id=s.id) AS avg_grade,
+        (SELECT COUNT(*) FROM attendance a JOIN enrollments en ON a.enrollment_id=en.id WHERE en.student_id=s.id) AS att_total,
+        (SELECT COUNT(*) FROM attendance a JOIN enrollments en ON a.enrollment_id=en.id WHERE en.student_id=s.id AND a.status='Present') AS att_present,
+        (SELECT COUNT(*) FROM library_borrows WHERE borrower_type='student' AND student_id=s.id AND status IN('Borrowed','Overdue')) AS books_borrowed,
+        (SELECT COUNT(*) FROM library_borrows WHERE borrower_type='student' AND student_id=s.id AND status='Overdue') AS books_overdue
     FROM student_parents sp JOIN students s ON sp.student_id=s.id JOIN users u ON s.user_id=u.id
     WHERE sp.parent_id=? ORDER BY sp.is_primary DESC, s.first_name");
 $children->execute([$parent['id']]); $children = $children->fetchAll();
+
+// Aggregate totals across ALL children
+$agg = [
+    'total_children'  => count($children),
+    'total_balance'   => array_sum(array_column($children,'balance_due')),
+    'total_paid'      => array_sum(array_column($children,'total_paid')),
+    'total_fees'      => array_sum(array_column($children,'total_fees')),
+    'pending_payments'=> array_sum(array_column($children,'pending_count')),
+    'books_borrowed'  => array_sum(array_column($children,'books_borrowed')),
+    'books_overdue'   => array_sum(array_column($children,'books_overdue')),
+];
+
+// Recent notices for parents
+try {
+    $notices = $pdo->query("SELECT * FROM notices WHERE is_active=1 AND audience IN('all','parent') ORDER BY post_date DESC LIMIT 5")->fetchAll();
+} catch(Exception $e) { $notices = []; }
 
 $selected_id = (int)($_GET['student_id'] ?? ($children[0]['id'] ?? 0));
 $tab = $_GET['tab'] ?? 'overview';
@@ -94,12 +116,121 @@ require_once '../../includes/header.php';
 <div class="page-header">
   <div>
     <h1><i class="fas fa-user-friends" style="color:var(--primary)"></i> Parent Portal</h1>
-    <p style="color:var(--muted)">Welcome, <?= e($parent['first_name'].' '.$parent['last_name']) ?></p>
+    <p style="color:var(--muted)">Welcome, <?= e($parent['first_name'].' '.$parent['last_name']) ?> &mdash; <?= date('l, F j, Y') ?></p>
   </div>
 </div>
 
-<!-- Child selector -->
+<!-- ── FAMILY SUMMARY CARDS ─────────────────────────────────── -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px">
+  <div style="background:linear-gradient(135deg,#4361ee,#7209b7);border-radius:14px;padding:18px 16px;color:#fff;display:flex;align-items:center;gap:14px">
+    <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-user-graduate" style="font-size:1.1rem"></i></div>
+    <div><div style="font-size:1.8rem;font-weight:800;line-height:1"><?= $agg['total_children'] ?></div><div style="font-size:.75rem;opacity:.8;margin-top:2px">Student<?= $agg['total_children']!=1?'s':'' ?> Assigned</div></div>
+  </div>
+  <div style="background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 2px 10px rgba(0,0,0,.06);display:flex;align-items:center;gap:14px;border-top:3px solid #10b981">
+    <div style="width:44px;height:44px;border-radius:12px;background:#dcfce7;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-check-circle" style="color:#10b981;font-size:1.1rem"></i></div>
+    <div><div style="font-size:1.5rem;font-weight:800;color:#1e293b;line-height:1">$<?= number_format($agg['total_paid'],0) ?></div><div style="font-size:.75rem;color:#64748b;margin-top:2px">Total Paid</div></div>
+  </div>
+  <div style="background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 2px 10px rgba(0,0,0,.06);display:flex;align-items:center;gap:14px;border-top:3px solid <?= $agg['total_balance']>0?'#e63946':'#10b981' ?>">
+    <div style="width:44px;height:44px;border-radius:12px;background:<?= $agg['total_balance']>0?'#fee2e2':'#dcfce7' ?>;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-exclamation-circle" style="color:<?= $agg['total_balance']>0?'#e63946':'#10b981' ?>;font-size:1.1rem"></i></div>
+    <div><div style="font-size:1.5rem;font-weight:800;color:#1e293b;line-height:1">$<?= number_format($agg['total_balance'],0) ?></div><div style="font-size:.75rem;color:#64748b;margin-top:2px">Balance Due</div></div>
+  </div>
+  <div style="background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 2px 10px rgba(0,0,0,.06);display:flex;align-items:center;gap:14px;border-top:3px solid <?= $agg['pending_payments']>0?'#f59e0b':'#10b981' ?>">
+    <div style="width:44px;height:44px;border-radius:12px;background:<?= $agg['pending_payments']>0?'#fef9c3':'#dcfce7' ?>;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-receipt" style="color:<?= $agg['pending_payments']>0?'#f59e0b':'#10b981' ?>;font-size:1.1rem"></i></div>
+    <div><div style="font-size:1.5rem;font-weight:800;color:#1e293b;line-height:1"><?= $agg['pending_payments'] ?></div><div style="font-size:.75rem;color:#64748b;margin-top:2px">Pending Payment<?= $agg['pending_payments']!=1?'s':'' ?></div></div>
+  </div>
+  <div style="background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 2px 10px rgba(0,0,0,.06);display:flex;align-items:center;gap:14px;border-top:3px solid #4361ee">
+    <div style="width:44px;height:44px;border-radius:12px;background:#eff6ff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-book-open" style="color:#4361ee;font-size:1.1rem"></i></div>
+    <div><div style="font-size:1.5rem;font-weight:800;color:#1e293b;line-height:1"><?= $agg['books_borrowed'] ?></div><div style="font-size:.75rem;color:#64748b;margin-top:2px">Books Borrowed<?= $agg['books_overdue']>0?' <span style="color:#e63946">('.$agg['books_overdue'].' overdue)</span>':'' ?></div></div>
+  </div>
+</div>
+
+<!-- ── ALERTS ────────────────────────────────────────────────── -->
+<?php if($agg['total_balance']>0): ?>
+<div style="background:linear-gradient(135deg,#e63946,#c1121f);color:#fff;border-radius:12px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px">
+  <i class="fas fa-exclamation-triangle" style="font-size:1.4rem;flex-shrink:0"></i>
+  <div><strong><?= $agg['pending_payments'] ?> pending payment<?= $agg['pending_payments']!=1?'s':'' ?></strong> totalling <strong>$<?= number_format($agg['total_balance'],2) ?></strong> outstanding across your children.</div>
+</div>
+<?php endif; ?>
+<?php if($agg['books_overdue']>0): ?>
+<div style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border-radius:12px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px">
+  <i class="fas fa-book" style="font-size:1.4rem;flex-shrink:0"></i>
+  <div><strong><?= $agg['books_overdue'] ?> overdue library book<?= $agg['books_overdue']!=1?'s':'' ?></strong> — please return them to avoid fines.</div>
+</div>
+<?php endif; ?>
+
+<!-- ── ALL CHILDREN AT A GLANCE ──────────────────────────────── -->
+<?php if(count($children) > 0): ?>
+<div style="margin-bottom:24px">
+  <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;margin-bottom:12px"><i class="fas fa-users" style="color:var(--primary)"></i> Your Children</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+  <?php foreach($children as $ch):
+    $ch_att = $ch['att_total']>0 ? round($ch['att_present']/$ch['att_total']*100) : null;
+    $ch_paid_pct = $ch['total_fees']>0 ? round($ch['total_paid']/$ch['total_fees']*100) : 0;
+    $colors = ['#4361ee','#7209b7','#10b981','#f59e0b','#e63946','#0891b2'];
+    $col = $colors[abs(crc32($ch['first_name']))%count($colors)];
+  ?>
+  <a href="?student_id=<?=$ch['id']?>&tab=overview" style="text-decoration:none">
+  <div style="background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);overflow:hidden;transition:transform .15s,box-shadow .15s;border:2px solid <?=$ch['id']==$selected_id?'var(--primary)':'transparent'?>" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,.1)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 10px rgba(0,0,0,.06)'">
+    <!-- Header strip -->
+    <div style="background:<?=$col?>;padding:14px 16px;display:flex;align-items:center;gap:12px">
+      <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.25);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;flex-shrink:0"><?=strtoupper(substr($ch['first_name'],0,1).substr($ch['last_name'],0,1))?></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;color:#fff;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><?=e($ch['first_name'].' '.$ch['last_name'])?></div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.8)"><?=e($ch['student_code'])?> &middot; <?=$ch['enrolled_courses']?> course<?=$ch['enrolled_courses']!=1?'s':''?></div>
+      </div>
+      <?php if($ch['pending_count']>0): ?><span style="background:#e63946;color:#fff;border-radius:20px;padding:2px 9px;font-size:.72rem;font-weight:700;flex-shrink:0"><?=$ch['pending_count']?> due</span><?php endif; ?>
+    </div>
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border-bottom:1px solid #f1f5f9">
+      <div style="padding:12px;text-align:center;border-right:1px solid #f1f5f9">
+        <div style="font-size:1.1rem;font-weight:800;color:#1e293b"><?=$ch['avg_grade']?$ch['avg_grade'].'%':'—'?></div>
+        <div style="font-size:.68rem;color:#94a3b8;margin-top:1px">Avg Grade</div>
+      </div>
+      <div style="padding:12px;text-align:center;border-right:1px solid #f1f5f9">
+        <div style="font-size:1.1rem;font-weight:800;color:<?=$ch_att!==null&&$ch_att<75?'#e63946':'#10b981'?>"><?=$ch_att!==null?$ch_att.'%':'—'?></div>
+        <div style="font-size:.68rem;color:#94a3b8;margin-top:1px">Attendance</div>
+      </div>
+      <div style="padding:12px;text-align:center">
+        <div style="font-size:1.1rem;font-weight:800;color:<?=$ch['balance_due']>0?'#e63946':'#10b981'?>">$<?=number_format($ch['balance_due'],0)?></div>
+        <div style="font-size:.68rem;color:#94a3b8;margin-top:1px">Balance</div>
+      </div>
+    </div>
+    <!-- Payment progress bar -->
+    <div style="padding:10px 14px">
+      <div style="display:flex;justify-content:space-between;font-size:.72rem;color:#94a3b8;margin-bottom:4px">
+        <span>Fees paid</span><span style="font-weight:700;color:#1e293b">$<?=number_format($ch['total_paid'],0)?> / $<?=number_format($ch['total_fees'],0)?></span>
+      </div>
+      <div style="height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:<?=min(100,$ch_paid_pct)?>%;background:<?=$ch['balance_due']>0?'#f59e0b':'#10b981'?>;border-radius:3px;transition:width .3s"></div>
+      </div>
+    </div>
+  </div>
+  </a>
+  <?php endforeach; ?>
+  </div>
+</div>
+<?php endif; ?>
+
+<!-- ── NOTICES ───────────────────────────────────────────────── -->
+<?php if($notices): ?>
+<div style="margin-bottom:24px">
+  <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;margin-bottom:12px"><i class="fas fa-bullhorn" style="color:var(--warning)"></i> Recent Notices</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+  <?php foreach($notices as $n): ?>
+  <div style="background:#fff;border-radius:12px;padding:14px 18px;box-shadow:0 1px 6px rgba(0,0,0,.05);border-left:4px solid var(--warning);display:flex;gap:14px;align-items:flex-start">
+    <i class="fas fa-bullhorn" style="color:var(--warning);margin-top:2px;flex-shrink:0"></i>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:.9rem;color:#1e293b"><?=e($n['title'])?></div>
+      <div style="font-size:.82rem;color:#64748b;margin-top:3px;line-height:1.5"><?=e(mb_substr($n['body'],0,120).(strlen($n['body'])>120?'...':''))?></div>
+      <div style="font-size:.72rem;color:#94a3b8;margin-top:4px"><i class="fas fa-calendar-alt"></i> <?=date('M j, Y',strtotime($n['post_date']))?></div>
+    </div>
+  </div>
+  <?php endforeach; ?>
+  </div>
+</div>
+<?php endif; ?>
 <?php if (count($children) > 1): ?>
+<div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;margin-bottom:10px"><i class="fas fa-user-graduate" style="color:var(--primary)"></i> View Detailed Report For</div>
 <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
   <?php foreach ($children as $c): ?>
   <a href="?student_id=<?=$c['id']?>&tab=<?=$tab?>" style="padding:10px 18px;border-radius:10px;text-decoration:none;font-weight:600;font-size:.88rem;background:<?=$c['id']==$selected_id?'var(--primary)':'#f0f2f8'?>;color:<?=$c['id']==$selected_id?'#fff':'#333'?>;display:flex;align-items:center;gap:8px">
@@ -145,6 +276,7 @@ require_once '../../includes/header.php';
   <div class="stat-card"><div class="stat-icon gold"><i class="fas fa-star"></i></div><div class="stat-info"><h3><?=$student['avg_grade']?$student['avg_grade'].'%':'—'?></h3><p>Overall Average</p></div></div>
   <div class="stat-card"><div class="stat-icon green"><i class="fas fa-dollar-sign"></i></div><div class="stat-info"><h3>$<?=number_format($total_paid,0)?></h3><p>Total Paid</p></div></div>
   <div class="stat-card"><div class="stat-icon <?=$student['balance_due']>0?'red':'green'?>"><i class="fas fa-exclamation-circle"></i></div><div class="stat-info"><h3>$<?=number_format($student['balance_due'],0)?></h3><p>Balance Due</p></div></div>
+  <div class="stat-card"><div class="stat-icon <?=$student['books_overdue']>0?'red':'blue'?>"><i class="fas fa-book"></i></div><div class="stat-info"><h3><?=$student['books_borrowed']?></h3><p>Books Borrowed<?=$student['books_overdue']>0?' <small style="color:var(--danger)">('.$student['books_overdue'].' overdue)</small>':''?></p></div></div>
 </div>
 
 <?php if($student['balance_due']>0):?>
