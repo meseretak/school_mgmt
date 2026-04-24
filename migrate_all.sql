@@ -712,6 +712,19 @@ CREATE TABLE IF NOT EXISTS student_documents (
 
 
 -- ═══════════════════════════════════════════════════════════════
+-- ── LIBRARY SETTINGS ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS library_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fine_per_day DECIMAL(8,2) DEFAULT 0.50,
+    max_borrow_days INT DEFAULT 14,
+    max_books_student INT DEFAULT 3,
+    max_books_teacher INT DEFAULT 5,
+    max_renewals INT DEFAULT 2,
+    lost_penalty_multiplier DECIMAL(5,2) DEFAULT 1.5,
+    lost_after_days INT DEFAULT 30,
+    currency VARCHAR(10) DEFAULT 'USD'
+);
+
 -- RE-ENABLE FOREIGN KEY CHECKS
 -- ═══════════════════════════════════════════════════════════════
 SET FOREIGN_KEY_CHECKS = 1;
