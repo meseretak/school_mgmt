@@ -331,8 +331,9 @@ CREATE TABLE IF NOT EXISTS library_borrows (
     borrowed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     due_date DATE NOT NULL,
     returned_at TIMESTAMP NULL,
-    status ENUM('Borrowed','Returned','Overdue','Lost') DEFAULT 'Borrowed',
+    status ENUM('Borrowed','Returned','Overdue','Lost','Return Requested') DEFAULT 'Borrowed',
     fine_amount DECIMAL(8,2) DEFAULT 0.00,
+    damage_fee DECIMAL(8,2) DEFAULT 0.00,
     fine_paid TINYINT(1) DEFAULT 0,
     notes TEXT,
     issued_by INT NULL,
@@ -343,6 +344,11 @@ CREATE TABLE IF NOT EXISTS library_borrows (
     FOREIGN KEY (issued_by) REFERENCES users(id),
     FOREIGN KEY (returned_to) REFERENCES users(id)
 );
+
+-- Add missing columns to existing library_borrows if upgrading
+ALTER TABLE library_borrows
+    MODIFY COLUMN status ENUM('Borrowed','Returned','Overdue','Lost','Return Requested') DEFAULT 'Borrowed';
+ALTER TABLE library_borrows ADD COLUMN IF NOT EXISTS damage_fee DECIMAL(8,2) DEFAULT 0.00 AFTER fine_amount;
 
 -- Book reservations (queue)
 CREATE TABLE IF NOT EXISTS library_reservations (
