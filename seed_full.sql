@@ -4,7 +4,7 @@
 -- ═══════════════════════════════════════════════════════════════
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Academic Year
+-- Academic Year updated
 INSERT IGNORE INTO academic_years (id,label,start_date,end_date,is_current) VALUES
 (1,'2023-2024','2023-09-01','2024-06-30',0),
 (2,'2024-2025','2024-09-01','2025-06-30',1),
