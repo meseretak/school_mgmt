@@ -31,6 +31,21 @@ $pdo = new PDO(
 
 session_start();
 
+// ── Security headers ───────────────────────────────────────
+header('X-Frame-Options: SAMEORIGIN');
+header('X-Content-Type-Options: nosniff');
+header('X-XSS-Protection: 1; mode=block');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+
+// ── Session security ───────────────────────────────────────
+// Regenerate session ID periodically to prevent fixation
+if (!isset($_SESSION['_created'])) {
+    $_SESSION['_created'] = time();
+} elseif (time() - $_SESSION['_created'] > 1800) {
+    session_regenerate_id(true);
+    $_SESSION['_created'] = time();
+}
+
 // Always refresh role from DB to prevent stale session role issues
 if (isset($_SESSION['user']['id'])) {
     try {
