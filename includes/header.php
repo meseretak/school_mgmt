@@ -56,7 +56,9 @@ $ap = $active_page ?? '';
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
-    <div class="sidebar-brand-icon"><i class="fas fa-graduation-cap"></i></div>
+    <div class="sidebar-brand-icon">
+      <img src="<?= BASE_URL ?>/assets/favicon.svg" alt="logo" style="width:22px;height:22px;filter:brightness(0) invert(1)">
+    </div>
     <span><?= APP_NAME ?></span>
   </div>
   <nav class="sidebar-nav">

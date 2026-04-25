@@ -236,7 +236,7 @@ body{font-family:'Inter',system-ui,sans-serif;min-height:100vh;display:flex;over
 
   <div class="left-content">
     <div class="brand-row">
-      <div class="brand-logo"><i class="fas fa-graduation-cap"></i></div>
+      <div class="brand-logo"><img src="<?= BASE_URL ?>/assets/favicon.svg" alt="logo" style="width:28px;height:28px;filter:brightness(0) invert(1)"></div>
       <div>
         <div class="brand-name"><?= APP_NAME ?></div>
         <div class="brand-tag">School Management Platform</div>
