@@ -156,7 +156,7 @@ require_once '../../includes/header.php';
       <td><?= $r['gpa'] ?></td>
       <td style="font-weight:700;color:var(--success)"><?= grade_letter($r['overall_pct']) ?></td>
       <td>
-        <span class="badge badge-<?= match($r['result']){'Pass','Merit','Distinction'=>'success','Fail'=>'danger',default=>'warning'} ?>">
+        <span class="badge badge-<?php $rr_=($r['result']??''); echo ($rr_==='Pass'||$rr_==='Merit'||$rr_==='Distinction')?'success':($rr_==='Fail'?'danger':'warning'); ?>">
           <?= $r['result'] === 'Distinction' ? '🏆 ' : ($r['result'] === 'Merit' ? '⭐ ' : '') ?><?= e($r['result']) ?>
         </span>
       </td>

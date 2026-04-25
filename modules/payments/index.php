@@ -95,7 +95,7 @@ require_once '../../includes/header.php';
       <td><?= $p['due_date']?date('M j, Y',strtotime($p['due_date'])):'—' ?></td>
       <td><?= e($p['method']) ?></td>
       <td><?= e($p['reference_no']??'—') ?></td>
-      <td><span class="badge badge-<?= match($p['status']){'Paid'=>'success','Pending'=>'warning','Overdue'=>'danger','Partial'=>'info',default=>'secondary'} ?>"><?= e($p['status']) ?></span></td>
+      <td><span class="badge badge-<?php $ps_=($p['status']??''); echo $ps_==='Paid'?'success':($ps_==='Pending'?'warning':($ps_==='Overdue'?'danger':($ps_==='Partial'?'info':'secondary'))); ?>"><?= e($p['status']) ?></span></td>
       <td>
         <a href="edit.php?id=<?= $p['id'] ?>" class="btn btn-sm btn-primary btn-icon"><i class="fas fa-edit"></i></a>
         <a href="delete.php?id=<?= $p['id'] ?>" class="btn btn-sm btn-danger btn-icon confirm-delete"><i class="fas fa-trash"></i></a>

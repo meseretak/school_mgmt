@@ -89,7 +89,7 @@ require_once '../../includes/header.php';
     <div style="font-size:1.1rem;font-weight:800"><?= e($clearance['student_name']) ?></div>
     <div style="opacity:.8;font-size:.85rem"><?= e($clearance['student_code']) ?> · Reason: <?= e($clearance['reason']) ?></div>
   </div>
-  <span class="badge badge-<?= match($clearance['status']){'Completed'=>'success','In Progress'=>'warning','Rejected'=>'danger',default=>'secondary'} ?>" style="font-size:.85rem"><?= e($clearance['status']) ?></span>
+  <span class="badge badge-<?php $cs_=($clearance['status']??''); echo $cs_==='Completed'?'success':($cs_==='In Progress'?'warning':($cs_==='Rejected'?'danger':'secondary')); ?>" style="font-size:.85rem"><?= e($clearance['status']) ?></span>
 </div>
 
 <div class="card">
@@ -106,7 +106,7 @@ require_once '../../includes/header.php';
         <?php if ($item['remarks']): ?><div style="font-size:.8rem;color:#666;margin-top:4px;font-style:italic"><?= e($item['remarks']) ?></div><?php endif; ?>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
-        <span class="badge badge-<?= match($item['status']){'Cleared'=>'success','Rejected'=>'danger',default=>'warning'} ?>"><?= e($item['status']) ?></span>
+        <span class="badge badge-<?php $is_=($item['status']??''); echo $is_==='Cleared'?'success':($is_==='Rejected'?'danger':'warning'); ?>"><?= e($item['status']) ?></span>
         <?php if ($item['status']==='Pending' && $clearance['status']!=='Completed'):
           $can_sign = is_admin() || $role === $item['responsible_role'];
           if ($can_sign): ?>

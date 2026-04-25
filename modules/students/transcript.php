@@ -151,7 +151,7 @@ td { padding:6px 10px; border-bottom:1px solid #f5f5f5; }
     <div>Average: <strong><?= $r['overall_pct'] ?>%</strong></div>
     <div>GPA: <strong><?= $r['gpa'] ?></strong></div>
     <?php if ($r['rank_in_class']): ?><div>Rank: <strong><?= $r['rank_in_class'] ?>/<?= $r['total_in_class'] ?></strong></div><?php endif; ?>
-    <div><span style="background:<?= match($r['result']){'Distinction'=>'#2dc653','Merit'=>'#4361ee','Pass'=>'#2dc653','Fail'=>'#e63946',default=>'#888'} ?>;color:#fff;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700"><?= e($r['result']) ?></span></div>
+    <div><span style="background:<?php $res_=($r['result']??''); echo $res_==='Distinction'?'#2dc653':($res_==='Merit'?'#4361ee':($res_==='Pass'?'#2dc653':($res_==='Fail'?'#e63946':'#888'))); ?>;color:#fff;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700"><?= e($r['result']) ?></span></div>
   </div>
   <?php endforeach; ?>
 </div>

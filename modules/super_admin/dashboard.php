@@ -168,7 +168,7 @@ require_once '../../includes/header.php';
     <?php foreach ($recent_activity as $a): ?>
     <tr>
       <td style="font-weight:600"><?= e($a['name']) ?></td>
-      <td><span class="badge badge-<?= match($a['role']){'super_admin'=>'danger','admin'=>'primary','teacher'=>'secondary','student'=>'info',default=>'secondary'} ?>"><?= ucfirst($a['role']) ?></span></td>
+      <td><span class="badge badge-<?php $r_=($a['role']??''); echo $r_==='super_admin'?'danger':($r_==='admin'?'primary':($r_==='teacher'?'secondary':($r_==='student'?'info':'secondary'))); ?>"><?= ucfirst($a['role']) ?></span></td>
       <td><code style="font-size:.78rem"><?= e($a['action']) ?></code></td>
       <td style="font-size:.82rem;color:#666"><?= e(mb_substr($a['description']??'',0,60)) ?></td>
       <td style="font-size:.78rem;color:#aaa"><?= e($a['ip']??'') ?></td>

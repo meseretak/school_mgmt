@@ -147,7 +147,7 @@ require_once '../../includes/header.php';
         <td style="font-weight:600"><?= e($p['sname']) ?></td>
         <td style="font-size:.82rem"><?= e($p['fee_name']) ?></td>
         <td>$<?= number_format($p['amount_paid'],0) ?></td>
-        <td><span class="badge badge-<?= match($p['status']){'Paid'=>'success','Pending'=>'warning','Overdue'=>'danger','Partial'=>'info',default=>'secondary'} ?>"><?= e($p['status']) ?></span></td>
+        <td><span class="badge badge-<?php $ps_=($p['status']??''); echo $ps_==='Paid'?'success':($ps_==='Pending'?'warning':($ps_==='Overdue'?'danger':($ps_==='Partial'?'info':'secondary'))); ?>"><?= e($p['status']) ?></span></td>
       </tr>
       <?php endforeach; ?>
       <?php if (!$recent_payments): ?><tr><td colspan="4" style="text-align:center;color:#aaa;padding:16px">No payments</td></tr><?php endif; ?>
@@ -167,7 +167,7 @@ require_once '../../includes/header.php';
     <?php foreach ($activity as $a): ?>
     <tr>
       <td style="font-weight:600"><?= e($a['uname']) ?></td>
-      <td><span class="badge badge-<?= match($a['role']){'super_admin'=>'danger','admin'=>'primary','teacher'=>'secondary','student'=>'info',default=>'secondary'} ?>"><?= ucfirst(str_replace('_',' ',$a['role'])) ?></span></td>
+      <td><span class="badge badge-<?php $ar_=($a['role']??''); echo $ar_==='super_admin'?'danger':($ar_==='admin'?'primary':($ar_==='teacher'?'secondary':($ar_==='student'?'info':'secondary'))); ?>"><?= ucfirst(str_replace('_',' ',$a['role'])) ?></span></td>
       <td><code style="font-size:.78rem"><?= e($a['action']) ?></code></td>
       <td style="font-size:.82rem;color:#666"><?= e(mb_substr($a['description']??'',0,70)) ?></td>
       <td style="font-size:.78rem;color:#aaa"><?= e($a['ip']??'') ?></td>

@@ -122,7 +122,7 @@ require_once '../../includes/header.php';
         <td>$<?= number_format($p['amount_paid'],2) ?></td>
         <td><?= $p['due_date']?date('M j, Y',strtotime($p['due_date'])):'—' ?></td>
         <td><?= e($p['method']) ?></td>
-        <td><span class="badge badge-<?= match($p['status']){'Paid'=>'success','Pending'=>'warning','Overdue'=>'danger','Partial'=>'info',default=>'secondary'} ?>"><?= e($p['status']) ?></span></td>
+        <td><span class="badge badge-<?php $ps_=($p['status']??''); echo $ps_==='Paid'?'success':($ps_==='Pending'?'warning':($ps_==='Overdue'?'danger':($ps_==='Partial'?'info':'secondary'))); ?>"><?= e($p['status']) ?></span></td>
       </tr>
       <?php endforeach; ?>
       <?php if (!$payments): ?><tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">No payment records</td></tr><?php endif; ?>

@@ -158,7 +158,7 @@ require_once '../../includes/header.php';
     <tr>
       <td style="font-weight:600"><?= e($sub['student_name']) ?> <small style="color:#888"><?= e($sub['student_code']) ?></small></td>
       <td style="font-size:.82rem"><?= $sub['submitted_at']?date('M j, Y g:i A',strtotime($sub['submitted_at'])):'—' ?></td>
-      <td><span class="badge badge-<?= match($sub['status']??''){'Graded'=>'success','Submitted'=>'info','Late'=>'warning','Missing'=>'danger',default=>'secondary'} ?>"><?= e($sub['status']??'—') ?></span></td>
+      <td><span class="badge badge-<?php $ss_=($sub['status']??''); echo $ss_==='Graded'?'success':($ss_==='Submitted'?'info':($ss_==='Late'?'warning':($ss_==='Missing'?'danger':'secondary'))); ?>"><?= e($sub['status']??'—') ?></span></td>
       <td><?= $sub['marks_obtained']??'—' ?></td>
       <td style="font-weight:700;color:var(--success)"><?= e($sub['grade_letter']??'—') ?></td>
       <td>
@@ -299,7 +299,7 @@ function openGrade(sid, aid, marks, feedback) {
       </td>
       <td><?= $a['total_marks'] ?></td>
       <?php if ($role === 'student'): ?>
-      <td><span class="badge badge-<?= match($a['sub_status']??''){'Graded'=>'success','Submitted'=>'info','Late'=>'warning','Missing'=>'danger',default=>'secondary'} ?>"><?= $a['sub_status']??'Not Submitted' ?></span></td>
+      <td><span class="badge badge-<?php $ss2_=($a['sub_status']??''); echo $ss2_==='Graded'?'success':($ss2_==='Submitted'?'info':($ss2_==='Late'?'warning':($ss2_==='Missing'?'danger':'secondary'))); ?>"><?= $a['sub_status']??'Not Submitted' ?></span></td>
       <td style="font-weight:700;color:var(--success)"><?= $a['grade_letter']??'—' ?></td>
       <?php elseif ($is_admin_view): ?>
       <td>
